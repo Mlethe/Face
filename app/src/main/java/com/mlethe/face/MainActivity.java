@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int type = Facepp.getSDKAuthType(ConUtil.getFileContent(this, R.raw.megviifacepp_0_5_2_model));
         if (type == 2) {    // 非联网授权
             String errorCode = facepp.init(this, ConUtil.getFileContent(this, R.raw.megviifacepp_0_5_2_model), 1);
-            if (TextUtils.isEmpty(errorCode)) {
+            if (errorCode != null) {
                 return;
             }
             Facepp.FaceppConfig faceppConfig = facepp.getFaceppConfig();
@@ -86,6 +86,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         public void onSuccess() {
                             String errorCode = facepp.init(MainActivity.this, ConUtil.getFileContent(MainActivity.this, R.raw.megviifacepp_0_5_2_model), 1);
                             Log.e("TAG", "onSuccess: 初始化成功" + "    errorCode->" + errorCode);
+                            if (errorCode != null) {
+                                return;
+                            }
                             Facepp.FaceppConfig faceppConfig = facepp.getFaceppConfig();
                             faceppConfig.detectionMode = Facepp.FaceppConfig.DETECTION_MODE_TRACKING_FAST;
                             facepp.setFaceppConfig(faceppConfig);

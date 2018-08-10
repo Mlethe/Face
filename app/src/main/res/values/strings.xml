@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Face</string>
+
+    <string-array name="trackig_mode_array">
+        <item>Fast</item>
+        <item>Robust</item>
+        <item>Tracking_Rect</item>
+    </string-array>
 </resources>

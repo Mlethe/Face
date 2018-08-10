@@ -11,6 +11,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import com.megvii.facepp.sdk.Facepp;
+import com.mlethe.face.utils.ConUtil;
 import com.mlethe.face.utils.OpenGLUtil;
 
 import java.io.IOException;
@@ -35,6 +37,9 @@ public class CameraActivity extends AppCompatActivity implements GLSurfaceView.R
     private SurfaceTexture mSurface;
 
     private Camera mCamera;
+    private Facepp facepp;
+    private int cameraWidth;
+    private int cameraHeight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +49,8 @@ public class CameraActivity extends AppCompatActivity implements GLSurfaceView.R
         mGlSurfaceView.setEGLContextClientVersion(2);
         mGlSurfaceView.setRenderer(this);
         mGlSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+
+        facepp = new Facepp();
     }
 
     @Override
@@ -62,13 +69,40 @@ public class CameraActivity extends AppCompatActivity implements GLSurfaceView.R
         int height = 480;
         // 获取相机大小
         Camera.Size bestPreviewSize = calBestPreviewSize(parameters, width, height);
+        cameraWidth = bestPreviewSize.width;
+        cameraHeight = bestPreviewSize.height;
         parameters.setPreviewSize(bestPreviewSize.width, bestPreviewSize.height);
 //        parameters.setPreviewSize(1280, 720);
         mCamera.setParameters(parameters);
 
-        // 开启检测人脸
-        mCamera.setPreviewCallback(this);
+        /*String errorCode = facepp.init(this, ConUtil.getFileContent(this, R.raw.megviifacepp_0_5_2_model), 1);
+        if (errorCode != null) {
+            return;
+        }
 
+        int left = 0;
+        int top = 0;
+        int right = cameraWidth;
+        int bottom = cameraHeight;
+
+        Facepp.FaceppConfig faceppConfig = facepp.getFaceppConfig();
+        faceppConfig.interval = 25;
+        faceppConfig.minFaceSize = 200;
+        faceppConfig.roi_left = left;
+        faceppConfig.roi_top = top;
+        faceppConfig.roi_right = right;
+        faceppConfig.roi_bottom = bottom;
+        String[] array = getResources().getStringArray(R.array.trackig_mode_array);
+        String trackModel = "Fast";
+        if (trackModel.equals(array[0]))
+            faceppConfig.detectionMode = Facepp.FaceppConfig.DETECTION_MODE_TRACKING_FAST;
+        else if (trackModel.equals(array[1]))
+            faceppConfig.detectionMode = Facepp.FaceppConfig.DETECTION_MODE_TRACKING_ROBUST;
+        else if (trackModel.equals(array[2])) {
+            faceppConfig.detectionMode = Facepp.FaceppConfig.MG_FPP_DETECTIONMODE_TRACK_RECT;
+        }
+
+        facepp.setFaceppConfig(faceppConfig);*/
     }
 
     @Override
@@ -102,6 +136,8 @@ public class CameraActivity extends AppCompatActivity implements GLSurfaceView.R
             mCamera.setPreviewTexture(mSurface);
             //开启预览
             mCamera.startPreview();
+            // 开启检测人脸
+            mCamera.setPreviewCallback(this);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -448,6 +484,10 @@ public class CameraActivity extends AppCompatActivity implements GLSurfaceView.R
 
     @Override
     public void onPreviewFrame(byte[] bytes, Camera camera) {
+        //检测操作放到主线程，防止贴点延迟
+        int width = cameraWidth;
+        int height = cameraHeight;
 
+//        Facepp.Face[] faces = facepp.detect(bytes, width, height, Facepp.IMAGEMODE_NV21);
     }
 }
